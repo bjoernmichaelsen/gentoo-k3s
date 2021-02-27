@@ -1,0 +1,3 @@
+[k3s-overlay]
+location = /var/db/repos/k3s-overlay
+auto-sync = no
