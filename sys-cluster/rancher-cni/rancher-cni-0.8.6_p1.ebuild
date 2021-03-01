@@ -8,7 +8,7 @@ DESCRIPTION="Rancher CNI plugins"
 HOMEPAGE="https://github.com/rancher/plugins"
 MY_PV="0.8.6-k3s1"
 
-go-module_set_globals
+#go-module_set_globals
 SRC_URI="https://github.com/rancher/plugins/archive/v${MY_PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="Apache-2.0"
@@ -18,20 +18,16 @@ IUSE="hardened"
 
 DEPEND="${COMMON_DEPEND}"
 BDEPEND="dev-lang/go"
-
-src_unpack() {
-	default_src_unpack
-	mv plugins* ${P}
-}
+S="${WORKDIR}/plugins-${MY_PV}"
 
 src_compile() {
 	CGO_LDFLAGS="$(usex hardened '-fno-PIC ' '')" \
 	LDFLAGS="-w -s" \
-	CGO_ENABLED=0 go build -tags 'ctrd apparmor seccomp no_btrfs netcgo osusergo providerless' -ldflags '-w -s' -o cni
+	CGO_ENABLED=0 go build -mod=vendor -tags 'ctrd apparmor seccomp no_btrfs netcgo osusergo providerless' -ldflags '-w -s' -o cni
 }
 
 src_install() {
-	newbin cni cni
+	dobin cni
 	dosym /usr/bin/cni /usr/bin/bridge
 	dosym /usr/bin/cni /usr/bin/flannel
 	dosym /usr/bin/cni /usr/bin/host-local

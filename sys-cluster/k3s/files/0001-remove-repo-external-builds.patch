@@ -23,7 +23,7 @@ index bf9b388bd8..53826c01eb 100755
      bin/k3s-server \
      bin/kubectl \
      bin/crictl \
-@@ -87,20 +82,6 @@ cleanup() {
+@@ -87,44 +82,10 @@ cleanup() {
      exit ${exit_status}
  }
  
@@ -42,9 +42,10 @@ index bf9b388bd8..53826c01eb 100755
 -# echo Building agent
 -# CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s-agent ./cmd/agent/main.go
  echo Building server
- CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC_SQLITE" -o bin/containerd ./cmd/server/main.go
+-CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC_SQLITE" -o bin/containerd ./cmd/server/main.go
++CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC_SQLITE" -o bin/containerd ./cmd/server/main.go
  ln -s containerd ./bin/k3s-agent
-@@ -108,23 +89,3 @@ ln -s containerd ./bin/k3s-server
+ ln -s containerd ./bin/k3s-server
  ln -s containerd ./bin/kubectl
  ln -s containerd ./bin/crictl
  ln -s containerd ./bin/ctr

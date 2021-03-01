@@ -8,12 +8,7 @@ DESCRIPTION="Lightweight Kubernetes: Production ready, easy to install, half the
 HOMEPAGE="https://github.com/k3s-io/k3s"
 MY_PV="1.20.0+k3s2"
 
-EGO_SUMS=(
-	"https://github.com/k3s-io/k3s v${MY_PV}/go.mod"
-	"https://github.com/k3s-io/k3s v${MY_PV}"
-)
-go-module_set_globals
-SRC_URI="https://github.com/k3s-io/k3s/archive/v${MY_PV}.tar.gz -> ${P}.tar.gz ${EGO_SUM_SRC_URI}"
+SRC_URI="https://github.com/k3s-io/k3s/archive/v${MY_PV}.tar.gz -> ${P}.tar.gz"
 PATCHES=(
 	"${FILESDIR}/0001-remove-repo-external-builds.patch"
 )
@@ -24,24 +19,19 @@ KEYWORDS="~amd64"
 IUSE=""
 DEPEND="${COMMON_DEPEND}"
 BDEPEND="dev-lang/go"
-
-src_unpack() {
-	default_src_unpack
-	find .
-	mv k3s* ${P}
-}
+S="${WORKDIR}/k3s-1.20.0-k3s2"
 
 src_compile() {
 	mkdir -p build/data && ./scripts/download && go generate
 	./scripts/build
-	./scripts/package-cli
 }
 
 src_install() {
-	newbin dist/artifacts/k3s k3s
-	dosym k3s /usr/bin/k3s-agent
-	dosym k3s /usr/bin/k3s-server
-	dosym k3s /usr/bin/kubectl
-	dosym k3s /usr/bin/crictl
-	dosym k3s /usr/bin/ctr
+	dobin bin/containerd
+	dosym containerd /usr/bin/k3s
+	dosym containerd /usr/bin/k3s-agent
+	dosym containerd /usr/bin/k3s-server
+	dosym containerd /usr/bin/kubectl
+	dosym containerd /usr/bin/crictl
+	dosym containerd /usr/bin/ctr
 }
