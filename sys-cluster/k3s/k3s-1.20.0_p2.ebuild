@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit go-module
+inherit go-module linux-info
 
 DESCRIPTION="Lightweight Kubernetes: Production ready, easy to install, half the memory."
 HOMEPAGE="https://github.com/k3s-io/k3s"
@@ -20,6 +20,8 @@ IUSE=""
 DEPEND="${COMMON_DEPEND}"
 BDEPEND="dev-lang/go"
 S="${WORKDIR}/k3s-1.20.0-k3s2"
+
+CONFIG_CHECK="~MEMCG ~CGROUP_PIDS ~BRIDGE_NETFILTER ~OVERLAY_FS ~IP_VS ~CFS_BANDWIDTH ~VXLAN ~VLAN"
 
 src_compile() {
 	mkdir -p build/data && ./scripts/download && go generate
