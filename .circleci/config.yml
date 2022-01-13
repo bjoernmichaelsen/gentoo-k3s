@@ -1,0 +1,33 @@
+version: 2.1
+
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          command: make
+          name: build
+      - store_artifacts:
+          path: build/Manifest
+      - store_artifacts:
+          path: build/environment.bz2
+      - run:
+          command: make push-image
+          name: push image
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
+  weekly:
+    triggers:
+      - schedule:
+          cron: "20 22 * * 2"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - build
