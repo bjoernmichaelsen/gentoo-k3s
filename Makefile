@@ -9,15 +9,15 @@ all: $(BUILDDIR)/environment.bz2 $(BUILDDIR)/Manifest
 	@true
 
 $(BUILDDIR)/environment.bz2: $(BUILDDIR)/gentoo-k3s.cid
-	docker run --rm $(IMAGE_REPO):$(IMAGE_TAG) /bin/sh -c 'cat `find /var/db/pkg/sys-cluster/ -name $(notdir $@) |grep k3s`' > $@
+	docker run --entrypoint /bin/sh --rm $(IMAGE_REPO):$(IMAGE_TAG) -c 'cat $$(find /var/db/pkg/sys-cluster/ -name $(notdir $@) |grep k3s)' > $@
 
 $(BUILDDIR)/Manifest: $(BUILDDIR)/gentoo-k3s.cid
-	docker run --rm $(IMAGE_REPO):$(IMAGE_TAG) cat /var/db/repos/gentoo/Manifest > $@
+	docker run --entrypoint /bin/cat --rm $(IMAGE_REPO):$(IMAGE_TAG) /var/db/repos/gentoo/Manifest > $@
 
 $(BUILDDIR)/gentoo-k3s.cid: $(BUILDDIR)/.dir
 	cp Dockerfile $(BUILDDIR)
 	cd $(BUILDDIR) && docker build . -t $(IMAGE_REPO):$(IMAGE_TAG)
-	docker tag $(IMAGE_REPO):$(IMAGE_TAG) $(IMAGE_REPO):`docker run $(IMAGE_REPO):$(IMAGE_TAG) sh -c "k3s --version|grep ^k3s|cut -f3 -d\ |sed s/+k3s-//"`
+	docker tag $(IMAGE_REPO):$(IMAGE_TAG) $(IMAGE_REPO):`docker run --entrypoint /bin/sh $(IMAGE_REPO):$(IMAGE_TAG) -c "k3s --version|grep ^k3s|cut -f3 -d\ |sed s/+k3s-//"`
 	touch $@
 
 $(BUILDDIR)/.dir:
