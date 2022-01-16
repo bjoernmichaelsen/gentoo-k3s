@@ -1,0 +1,26 @@
+FROM bjoernmichaelsen/gentoo-k3s:latest AS base
+#RUN USE="static" emerge strace
+RUN emerge strace
+FROM scratch as runtime
+COPY --from=base /usr/share/ca-certificates/mozilla/* /var/lib/rancher/k3s/server/tls/
+COPY --from=base /usr/bin/strace /bin/
+#COPY --from=base /usr/bin/ldd /bin/
+COPY --from=base /usr/bin/k3s /bin/
+COPY --from=base /bin/busybox /bin/
+
+COPY --from=base /lib64/librt.so.1 /lib64/
+#COPY --from=base /lib64/librt-2.33.so /lib/
+COPY --from=base /lib64/libc.so.6 /lib64/
+#COPY --from=base /lib64/libc-2.33.so /lib/
+COPY --from=base /lib64/libpthread.so.0 /lib64/
+#COPY --from=base /lib64/libpthread-2.33.so /lib/
+COPY --from=base /lib64/ld-linux-x86-64.so.2 /lib64/
+COPY --from=base /lib64/libdl.so.2 /lib64
+COPY --from=base /usr/lib64/libseccomp.so.2 /usr/lib64/
+
+SHELL ["/bin/busybox", "sh", "-c"]
+RUN /bin/busybox --install -s /bin
+SHELL ["/bin/busybox", "sh", "-c"]
+RUN mkdir -p var/lib/rancher/k3s/data/
+#ENTRYPOINT ["/bin/strace", "/bin/k3s", "server", "--snapshotter=native"]
+ENTRYPOINT ["/bin/k3s", "server", "--snapshotter=native"]
